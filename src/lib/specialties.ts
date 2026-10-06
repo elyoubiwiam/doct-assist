@@ -492,7 +492,7 @@ export function loadTemplate(id: string, lang: Lang): Field[] {
 }
 
 export function saveTemplate(id: string, fields: Field[]) {
-  const clean: Stored[] = fields.map(({ key, label, type, unit, options, section }) => ({ key, label, type, unit, options, section }));
+  const clean: Stored[] = fields.map(({ key, label, type, unit, options, section }) => ({ ...(key ? { key } : {}), label, type, unit, options, section }));
   localStorage.setItem(tplKey(id), JSON.stringify(clean));
 }
 

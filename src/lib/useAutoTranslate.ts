@@ -56,7 +56,7 @@ export function useAutoTranslate() {
         const items = [...need[target]].slice(0, 150);
         try {
           const res = await translate({ data: { items, target } });
-          if (res.ok) res.items.forEach((t, i) => t && maps[target].set(items[i], t));
+          if (res.ok) res.items.forEach((t, i) => { const src = items[i]; if (t && src) maps[target].set(src, t); });
           else failed = true;
         } catch {
           failed = true;
