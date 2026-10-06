@@ -1,0 +1,65 @@
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import type { Field } from "./specialties";
+
+export type Suggestions = {
+  followUpQuestions: string[];
+  possibleAssessments: string[];
+  nextSteps: string[];
+  redFlags: string[];
+};
+
+export type Session = {
+  accepted: boolean;
+  specialty: string | null;
+  symptoms: string[];
+  fields: Field[];
+  values: Record<string, string | boolean>;
+  patient: { ref: string; age: string; sex: string; date: string; clinician: string };
+  notes: string;
+  suggestions: Suggestions | null;
+  included: Record<keyof Suggestions, boolean>;
+};
+
+const empty = (): Session => ({
+  accepted: false,
+  specialty: null,
+  symptoms: [],
+  fields: [],
+  values: {},
+  patient: { ref: "", age: "", sex: "", date: "", clinician: "" },
+  notes: "",
+  suggestions: null,
+  included: { followUpQuestions: true, possibleAssessments: true, nextSteps: true, redFlags: true },
+});
+
+const KEY = "anamnesis.session";
+const Ctx = createContext<{
+  s: Session;
+  update: (p: Partial<Session> | ((s: Session) => Partial<Session>)) => void;
+  resetPatient: () => void;
+  ready: boolean;
+}>({ s: empty(), update: () => {}, resetPatient: () => {}, ready: false });
+
+export function SessionProvider({ children }: { children: ReactNode }) {
+  const [s, setS] = useState<Session>(empty);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(KEY);
+      if (raw) setS({ ...empty(), ...JSON.parse(raw) });
+    } catch {
+      /* ignore */
+    }
+    setReady(true);
+  }, []);
+  useEffect(() => {
+    if (ready) sessionStorage.setItem(KEY, JSON.stringify(s));
+  }, [s, ready]);
+  const update: (p: Partial<Session> | ((s: Session) => Partial<Session>)) => void = (p) =>
+    setS((prev) => ({ ...prev, ...(typeof p === "function" ? p(prev) : p) }));
+  const resetPatient = () =>
+    setS((prev) => ({ ...empty(), accepted: prev.accepted, specialty: prev.specialty, patient: { ...empty().patient, clinician: prev.patient.clinician } }));
+  return <Ctx.Provider value={{ s, update, resetPatient, ready }}>{children}</Ctx.Provider>;
+}
+
+export const useSession = () => useContext(Ctx);
