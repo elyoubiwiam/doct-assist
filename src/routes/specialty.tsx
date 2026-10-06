@@ -41,7 +41,7 @@ function SpecialtyPage() {
             <button
               key={sp.id}
               onClick={() => {
-                update({ specialty: sp.id, fields: loadTemplate(sp.id, lang), values: {}, suggestions: null, symptoms: [] });
+                update({ specialty: sp.id, fields: loadTemplate(sp.id, lang), values: {}, suggestions: null, symptoms: [], translateFailed: false });
                 navigate({ to: "/symptoms" });
               }}
               className={cn(
@@ -52,7 +52,7 @@ function SpecialtyPage() {
               <span className="text-2xl" aria-hidden>{sp.icon}</span>
               <span>
                 <span className="block font-medium">{sp.name[lang]}</span>
-                <span className="block text-xs text-muted-foreground">{sp.fields.length} {lang === "fr" ? "champs" : "fields"}</span>
+                <span className="block text-xs text-muted-foreground">{t.fieldsCount(sp.fields.length)}</span>
               </span>
             </button>
           ))}
