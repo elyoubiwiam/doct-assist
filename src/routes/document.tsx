@@ -5,7 +5,7 @@ import { Guard } from "@/components/Guard";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useSession, type Suggestions } from "@/lib/session";
-import { specialtyName } from "@/lib/specialties";
+import { specialtyName, tr, type Field } from "@/lib/specialties";
 
 export const Route = createFileRoute("/document")({
   head: () => ({
@@ -39,13 +39,14 @@ function DocumentPage() {
   const now = new Date().toLocaleString(locale, { dateStyle: "long", timeStyle: "short" });
   const fmtDate = (d: string) => (d ? new Date(d).toLocaleDateString(locale, { dateStyle: "long" }) : t.notRecorded);
 
-  const display = (id: string, unit?: string | null) => {
-    const v = s.values[id];
+  const display = (f: Field) => {
+    const v = s.values[f.id];
     if (v === true) return t.yes;
     if (v === false || v === undefined || v === "") return null;
-    return unit ? `${v} ${unit}` : String(v);
+    if (f.type === "select") return tr(f.options?.[Number(v)], lang) || null;
+    return f.unit ? `${v} ${tr(f.unit, lang)}` : String(v);
   };
-  const recorded = s.fields.map((f) => ({ f, v: display(f.id, f.unit) })).filter((x) => x.v !== null);
+  const recorded = s.fields.map((f) => ({ f, v: display(f) })).filter((x) => x.v !== null);
 
   const blocks: [keyof Suggestions, string][] = [
     ["redFlags", t.redFlags],
@@ -94,7 +95,7 @@ function DocumentPage() {
             <div>
               <Row k={t.patientRef} v={s.patient.ref || t.notRecorded} />
               <Row k={t.age} v={s.patient.age || t.notRecorded} />
-              <Row k={t.sex} v={s.patient.sex || t.notRecorded} />
+              <Row k={t.sex} v={(s.patient.sex !== "" && t.sexOptions[Number(s.patient.sex)]) || t.notRecorded} />
             </div>
             <div>
               <Row k={t.consultDate} v={fmtDate(s.patient.date)} />
@@ -105,14 +106,14 @@ function DocumentPage() {
 
           <section className="avoid-break mt-6">
             <h2 className="mb-2 text-lg font-semibold text-primary">{t.presenting}</h2>
-            <p className="text-sm">{s.symptoms.join(", ")}</p>
+            <p className="text-sm">{s.symptoms.map((x) => tr(x, lang)).join(", ")}</p>
           </section>
 
           <section className="mt-6">
             <h2 className="mb-2 text-lg font-semibold text-primary">{t.findings}</h2>
             {recorded.length ? (
               <div className="grid gap-x-10 sm:grid-cols-2 print:grid-cols-2">
-                {recorded.map(({ f, v }) => <Row key={f.id} k={f.label} v={v!} />)}
+                {recorded.map(({ f, v }) => <Row key={f.id} k={tr(f.label, lang)} v={v!} />)}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">{t.notRecorded}</p>
@@ -135,7 +136,7 @@ function DocumentPage() {
                   <div key={k} className="avoid-break">
                     <h3 className={`font-sans text-sm font-semibold ${k === "redFlags" ? "text-destructive" : ""}`}>{title}</h3>
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
-                      {s.suggestions![k].map((x, i) => <li key={i}>{x}</li>)}
+                      {s.suggestions![k].map((x, i) => <li key={i}>{tr(x, lang)}</li>)}
                     </ul>
                   </div>
                 ))}

@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
 import { useSession, type Suggestions } from "@/lib/session";
-import { defaultTemplate, resetTemplate, saveTemplate, specialtyName, uid, type Field, type FieldType } from "@/lib/specialties";
+import { defaultTemplate, fromLang, isMissing, resetTemplate, saveTemplate, specialtyName, tr, uid, type Field, type FieldType } from "@/lib/specialties";
 
 export const Route = createFileRoute("/intake")({
   head: () => ({
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/intake")({
 const selectCls = "h-9 w-full rounded-md border border-input bg-card px-3 text-sm";
 
 function FieldInput({ f }: { f: Field }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { s, update } = useSession();
   const v = s.values[f.id];
   const set = (val: string | boolean) => update((p) => ({ values: { ...p.values, [f.id]: val } }));
@@ -45,7 +45,7 @@ function FieldInput({ f }: { f: Field }) {
     return (
       <select className={selectCls} value={(v as string) ?? ""} onChange={(e) => set(e.target.value)}>
         <option value="">{t.select}</option>
-        {(f.options ?? []).map((o) => <option key={o}>{o}</option>)}
+        {(f.options ?? []).map((o, i) => <option key={i} value={String(i)}>{tr(o, lang)}</option>)}
       </select>
     );
   if (f.type === "textarea")
@@ -59,13 +59,13 @@ function FieldInput({ f }: { f: Field }) {
         value={(v as string) ?? ""}
         onChange={(e) => set(e.target.value)}
       />
-      {f.unit && <span className="shrink-0 font-mono text-xs text-muted-foreground">{f.unit}</span>}
+      {f.unit && <span className="shrink-0 font-mono text-xs text-muted-foreground">{tr(f.unit, lang)}</span>}
     </div>
   );
 }
 
 function FieldGroup({ title, fields, tag }: { title: string; fields: Field[]; tag?: string }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { update } = useSession();
   if (!fields.length) return null;
   return (
@@ -79,8 +79,11 @@ function FieldGroup({ title, fields, tag }: { title: string; fields: Field[]; ta
           <div key={f.id} className="group">
             <div className="mb-1 flex items-center justify-between gap-2">
               <Label className="text-sm">
-                {f.label}
-                {f.section && <span className="ml-2 text-xs font-normal text-muted-foreground">{f.section}</span>}
+                {tr(f.label, lang)}
+                {f.section && <span className="ml-2 text-xs font-normal text-muted-foreground">{tr(f.section, lang)}</span>}
+                {(isMissing(f.label) || (f.options ?? []).some(isMissing)) && (
+                  <span className="ml-2 rounded bg-warning px-1.5 py-0.5 text-[10px] font-normal text-warning-foreground">{t.notTranslated}</span>
+                )}
               </Label>
               <button
                 aria-label={t.remove}
@@ -100,7 +103,7 @@ function FieldGroup({ title, fields, tag }: { title: string; fields: Field[]; ta
 }
 
 function AddField() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { update } = useSession();
   const [label, setLabel] = useState("");
   const [type, setType] = useState<FieldType>("text");
@@ -110,7 +113,19 @@ function AddField() {
     if (!l) return;
     const opts = options.split(",").map((x) => x.trim()).filter(Boolean).slice(0, 10);
     update((p) => ({
-      fields: [...p.fields, { id: uid(), label: l, type, options: type === "select" ? opts : null, unit: null, source: "custom" }],
+      fields: [
+        ...p.fields,
+        {
+          id: uid(),
+          label: fromLang(l, lang),
+          type,
+          options: type === "select" ? opts.map((o) => fromLang(o, lang)) : null,
+          unit: null,
+          section: null,
+          source: "custom",
+        },
+      ],
+      translateFailed: false,
     }));
     setLabel("");
     setOptions("");
@@ -125,7 +140,7 @@ function AddField() {
         {(Object.keys(t.types) as FieldType[]).map((k) => <option key={k} value={k}>{t.types[k]}</option>)}
       </select>
       {type === "select" && (
-        <Input className="w-56" placeholder="A, B, C" value={options} onChange={(e) => setOptions(e.target.value)} />
+        <Input className="w-56" placeholder={t.optionsPlaceholder} value={options} onChange={(e) => setOptions(e.target.value)} />
       )}
       <Button variant="secondary" onClick={add}><Plus className="h-4 w-4" />{t.addField}</Button>
     </div>
@@ -133,7 +148,7 @@ function AddField() {
 }
 
 function SuggestionBlock({ k, title, danger }: { k: keyof Suggestions; title: string; danger?: boolean }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { s, update } = useSession();
   const items = s.suggestions?.[k] ?? [];
   if (!items.length) return null;
@@ -147,7 +162,7 @@ function SuggestionBlock({ k, title, danger }: { k: keyof Suggestions; title: st
         </label>
       </div>
       <ul className="list-disc space-y-1 pl-5 text-sm">
-        {items.map((x, i) => <li key={i}>{x}</li>)}
+        {items.map((x, i) => <li key={i}>{tr(x, lang)}</li>)}
       </ul>
     </div>
   );
@@ -168,7 +183,7 @@ function IntakePage() {
       <Guard when={s.accepted && !!s.specialty && s.symptoms.length > 0}>
         <p className="text-sm font-medium text-primary">{s.specialty && specialtyName(s.specialty, lang)}</p>
         <h1 className="text-3xl font-semibold">{t.intakeTitle}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{s.symptoms.join(", ")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{s.symptoms.map((x) => tr(x, lang)).join(", ")}</p>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
           <div className="space-y-6">
@@ -181,7 +196,7 @@ function IntakePage() {
                   <Label>{t.sex}</Label>
                   <select className={selectCls} value={s.patient.sex} onChange={(e) => setP("sex", e.target.value)}>
                     <option value="">{t.select}</option>
-                    {t.sexOptions.map((o) => <option key={o}>{o}</option>)}
+                    {t.sexOptions.map((o, i) => <option key={i} value={String(i)}>{o}</option>)}
                   </select>
                 </div>
                 <div><Label>{t.consultDate}</Label><Input type="date" value={s.patient.date} onChange={(e) => setP("date", e.target.value)} /></div>
@@ -190,13 +205,13 @@ function IntakePage() {
             </section>
 
             <FieldGroup title={t.templateFields} fields={[...tpl, ...custom]} />
-            <FieldGroup title={t.aiFields} fields={ai} tag="AI" />
+            <FieldGroup title={t.aiFields} fields={ai} tag={t.aiBadge} />
             <AddField />
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 onClick={() => {
-                  saveTemplate(s.specialty!, lang, [...tpl, ...custom]);
+                  saveTemplate(s.specialty!, [...tpl, ...custom]);
                   toast.success(t.templateSaved);
                 }}
               >
@@ -205,8 +220,8 @@ function IntakePage() {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  resetTemplate(s.specialty!, lang);
-                  update((p) => ({ fields: [...defaultTemplate(p.specialty!, lang), ...p.fields.filter((f) => f.source === "ai")] }));
+                  resetTemplate(s.specialty!);
+                  update((p) => ({ fields: [...defaultTemplate(p.specialty!), ...p.fields.filter((f) => f.source === "ai")] }));
                   toast.success(t.templateReset);
                 }}
               >

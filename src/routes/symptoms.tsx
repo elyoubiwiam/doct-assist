@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
 import { generateIntake } from "@/lib/intake.functions";
 import { useSession } from "@/lib/session";
-import { specialtyName, uid } from "@/lib/specialties";
+import { fromLang, specialtyName, tr, uid } from "@/lib/specialties";
 
 export const Route = createFileRoute("/symptoms")({
   head: () => ({
@@ -36,12 +36,12 @@ function SymptomsPage() {
 
   const add = () => {
     const parts = draft.split(/[,;\n]/).map((x) => x.trim()).filter((x) => x.length > 0 && x.length <= 200);
-    if (parts.length) update((p) => ({ symptoms: [...p.symptoms, ...parts].slice(0, 20) }));
+    if (parts.length) update((p) => ({ symptoms: [...p.symptoms, ...parts.map((x) => fromLang(x, lang))].slice(0, 20) }));
     setDraft("");
   };
 
   const run = async () => {
-    const symptoms = draft.trim() ? [...s.symptoms, draft.trim()] : s.symptoms;
+    const symptoms = draft.trim() ? [...s.symptoms, fromLang(draft.trim().slice(0, 200), lang)] : s.symptoms;
     if (!symptoms.length) {
       toast.error(t.noSymptoms);
       return;
@@ -56,19 +56,37 @@ function SymptomsPage() {
       const res = await generate({
         data: {
           specialty: specialtyName(s.specialty!, "en"),
-          symptoms: symptoms.join("; "),
+          symptoms: symptoms.map((x) => tr(x, lang)).join("; "),
           lang,
-          existingFields: templateFields.map((f) => f.label),
+          existingFields: templateFields.map((f) => tr(f.label, lang)).slice(0, 80),
         },
       });
       if (!res.ok) {
         toast.error(t.errors[res.error] ?? t.errors['generic']);
         return;
       }
-      const { fields, ...suggestions } = res.result;
+      const { fields, ...sg } = res.result;
+      const b = (x: string) => fromLang(x, lang);
       update({
-        fields: [...templateFields, ...fields.map((f) => ({ ...f, id: uid(), source: "ai" as const }))],
-        suggestions,
+        fields: [
+          ...templateFields,
+          ...fields.map((f) => ({
+            id: uid(),
+            type: f.type,
+            label: b(f.label),
+            unit: f.unit ? b(f.unit) : null,
+            section: f.section ? b(f.section) : null,
+            options: f.options ? f.options.map(b) : null,
+            source: "ai" as const,
+          })),
+        ],
+        suggestions: {
+          followUpQuestions: sg.followUpQuestions.map(b),
+          possibleAssessments: sg.possibleAssessments.map(b),
+          nextSteps: sg.nextSteps.map(b),
+          redFlags: sg.redFlags.map(b),
+        },
+        translateFailed: false,
       });
       navigate({ to: "/intake" });
     } catch {
@@ -105,7 +123,7 @@ function SymptomsPage() {
             <ul className="mt-4 flex flex-wrap gap-2">
               {s.symptoms.map((x, i) => (
                 <li key={i} className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
-                  {x}
+                  {tr(x, lang)}
                   <button aria-label={t.remove} onClick={() => update((p) => ({ symptoms: p.symptoms.filter((_, j) => j !== i) }))}>
                     <X className="h-3.5 w-3.5" />
                   </button>

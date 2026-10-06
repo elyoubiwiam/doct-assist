@@ -11,5 +11,5 @@
 
 - All UI copy lives in `src/lib/i18n.tsx` (en + fr dictionaries); never hardcode user-facing strings, so both languages stay in sync.
 - Patient data stays in browser sessionStorage (`src/lib/session.tsx`); never persist it server-side, because of medical data sensitivity.
-- Clinician-edited specialty templates are saved per specialty and language in localStorage (`src/lib/specialties.ts`).
+- All session and template text is stored bilingually ({ en, fr }); missing sides are filled by the `translateContent` server function via `useAutoTranslate`, so content follows the language toggle. Clinician-edited templates are saved per specialty in localStorage (`src/lib/specialties.ts`).
 - AI intake generation runs only in the `generateIntake` server function; the browser never calls the AI gateway directly.

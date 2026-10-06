@@ -104,7 +104,7 @@ Existing fields already on the form: ${data.existingFields.join("; ") || "none"}
     }
   });
 
-const noDash = (s: string) => s.replace(/\s*[\u2014\u2013]\s*/g, ", ").slice(0, 240);
+const noDash = (s: string) => s.replace(/\s*[\u2014\u2013]\s*/g, ", ").slice(0, 600);
 
 function clean(o: GeneratedIntake): GeneratedIntake {
   return {
@@ -120,3 +120,51 @@ function clean(o: GeneratedIntake): GeneratedIntake {
     redFlags: (o.redFlags ?? []).slice(0, 6).map(noDash),
   };
 }
+
+const translateInput = z.object({
+  items: z.array(z.string().max(600)).min(1).max(150),
+  target: z.enum(["en", "fr"]),
+});
+
+export const translateContent = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => translateInput.parse(input))
+  .handler(async ({ data }): Promise<{ ok: true; items: string[] } | { ok: false; error: string }> => {
+    const apiKey = process.env['LOVABLE_API_KEY'];
+    if (!apiKey) return { ok: false, error: "config" };
+    const { streamText, Output, NoObjectGeneratedError } = await import("ai");
+    const { createGatewayProvider } = await import("./server/gateway.server");
+    const provider = createGatewayProvider(apiKey);
+    const target =
+      data.target === "fr"
+        ? "French (France), using the standard terminology a French physician would write"
+        : "British English (UK spelling and UK clinical terminology, e.g. paediatric, oedema, haemoptysis)";
+    const instructions = `You are a professional medical translator. Translate each input item into ${target}.
+Rules: keep the same number of items in the same order; translate faithfully, without adding, removing or explaining anything; keep numbers, units, abbreviations and scores (e.g. NYHA, GCS, HbA1c, mmHg) unchanged unless a standard local equivalent exists; keep question marks for questions; never use em dashes or en dashes. If an item is already in the target language, correct it only if it contains an error, otherwise return it unchanged.${data.target === "fr" ? " Apply French typography: a space before : ? ! and ;." : ""}`;
+    const schema = z.object({ items: z.array(z.string()) });
+    try {
+      const result = streamText({
+        model: provider.responses("openai/gpt-6-astra"),
+        instructions,
+        prompt: JSON.stringify({ items: data.items }),
+        output: Output.object({ schema }),
+        providerOptions: {
+          openai: { store: false, forceReasoning: true, reasoningEffort: "low", include: ["reasoning.encrypted_content"], strictJsonSchema: true },
+        },
+      });
+      let out: { items: string[] };
+      try {
+        out = (await result.output) as { items: string[] };
+      } catch (e) {
+        if (NoObjectGeneratedError.isInstance(e) && e.text) out = JSON.parse(e.text);
+        else throw e;
+      }
+      if (!Array.isArray(out.items) || out.items.length !== data.items.length) return { ok: false, error: "generic" };
+      return { ok: true, items: out.items.map(noDash) };
+    } catch (error) {
+      const status = (error as { statusCode?: number })?.statusCode;
+      console.error("translateContent failed", status, error);
+      if (status === 402) return { ok: false, error: "credits" };
+      if (status === 429) return { ok: false, error: "rate" };
+      return { ok: false, error: "generic" };
+    }
+  });
