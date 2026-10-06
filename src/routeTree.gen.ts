@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocumentRouteImport } from './routes/document'
+import { Route as IntakeRouteImport } from './routes/intake'
+import { Route as SpecialtyRouteImport } from './routes/specialty'
+import { Route as SymptomsRouteImport } from './routes/symptoms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocumentRoute = DocumentRouteImport.update({
+  id: '/document',
+  path: '/document',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntakeRoute = IntakeRouteImport.update({
+  id: '/intake',
+  path: '/intake',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpecialtyRoute = SpecialtyRouteImport.update({
+  id: '/specialty',
+  path: '/specialty',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SymptomsRoute = SymptomsRouteImport.update({
+  id: '/symptoms',
+  path: '/symptoms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/document': typeof DocumentRoute
+  '/intake': typeof IntakeRoute
+  '/specialty': typeof SpecialtyRoute
+  '/symptoms': typeof SymptomsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/document': typeof DocumentRoute
+  '/intake': typeof IntakeRoute
+  '/specialty': typeof SpecialtyRoute
+  '/symptoms': typeof SymptomsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/document': typeof DocumentRoute
+  '/intake': typeof IntakeRoute
+  '/specialty': typeof SpecialtyRoute
+  '/symptoms': typeof SymptomsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/document' | '/intake' | '/specialty' | '/symptoms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/document' | '/intake' | '/specialty' | '/symptoms'
+  id: '__root__' | '/' | '/document' | '/intake' | '/specialty' | '/symptoms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DocumentRoute: typeof DocumentRoute
+  IntakeRoute: typeof IntakeRoute
+  SpecialtyRoute: typeof SpecialtyRoute
+  SymptomsRoute: typeof SymptomsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/document': {
+      id: '/document'
+      path: '/document'
+      fullPath: '/document'
+      preLoaderRoute: typeof DocumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intake': {
+      id: '/intake'
+      path: '/intake'
+      fullPath: '/intake'
+      preLoaderRoute: typeof IntakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/specialty': {
+      id: '/specialty'
+      path: '/specialty'
+      fullPath: '/specialty'
+      preLoaderRoute: typeof SpecialtyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/symptoms': {
+      id: '/symptoms'
+      path: '/symptoms'
+      fullPath: '/symptoms'
+      preLoaderRoute: typeof SymptomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DocumentRoute: DocumentRoute,
+  IntakeRoute: IntakeRoute,
+  SpecialtyRoute: SpecialtyRoute,
+  SymptomsRoute: SymptomsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
