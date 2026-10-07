@@ -55,7 +55,8 @@ function DocumentPage() {
     ["possibleAssessments", t.assessments],
     ["nextSteps", t.nextSteps],
   ];
-  const shown = blocks.filter(([k]) => s.included[k] && (s.suggestions?.[k]?.length ?? 0) > 0);
+  const kept = (k: keyof Suggestions) => (s.suggestions?.[k] ?? []).map((x, i) => ({ x, i })).filter(({ i }) => !s.excluded[`${k}:${i}`]);
+  const shown = blocks.filter(([k]) => kept(k).length > 0);
 
   return (
     <AppShell step={5}>
@@ -137,7 +138,7 @@ function DocumentPage() {
                   <div key={k} className="avoid-break">
                     <h3 className={`font-sans text-sm font-semibold ${k === "redFlags" ? "text-destructive" : ""}`}>{title}</h3>
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
-                      {s.suggestions![k].map((x, i) => <li key={i}>{tr(x, lang)}</li>)}
+                      {kept(k).map(({ x, i }) => <li key={i}>{tr(x, lang)}</li>)}
                     </ul>
                   </div>
                 ))}
