@@ -52,49 +52,68 @@ function SymptomsPage() {
       setDraft("");
     }
     setLoading(true);
-    try {
-      const templateFields = s.fields.filter((f) => f.source !== "ai");
-      const res = await generate({
-        data: {
-          specialty: specialtyName(s.specialty, "en"),
-          symptoms: symptoms.map((x) => tr(x, lang)).join("; "),
-          lang,
-          existingFields: templateFields.map((f) => tr(f.label, lang)).slice(0, 80),
-        },
-      });
-      if (!res.ok) {
-        toast.error(t.errors[res.error] ?? t.errors['generic']);
-        return;
-      }
-      const { fields, ...sg } = res.result;
-      const b = (x: string) => fromLang(x, lang);
-      update({
-        fields: [
-          ...templateFields,
-          ...fields.map((f) => ({
-            id: uid(),
-            type: f.type,
-            label: b(f.label),
-            unit: f.unit ? b(f.unit) : null,
-            section: f.section ? b(f.section) : null,
-            options: f.options ? f.options.map(b) : null,
-            source: "ai" as const,
-          })),
-        ],
-        suggestions: {
-          followUpQuestions: sg.followUpQuestions.map(b),
-          possibleAssessments: sg.possibleAssessments.map(b),
-          nextSteps: sg.nextSteps.map(b),
-          redFlags: sg.redFlags.map(b),
-        },
-        translateFailed: false,
-      });
-      navigate({ to: "/intake" });
-    } catch {
-      toast.error(t.errors['generic']);
-    } finally {
-      setLoading(false);
+    const templateFields = s.fields.filter((f) => f.source !== "ai");
+    const runId = uid();
+    const b = (x: string) => fromLang(x, lang);
+    const base = {
+      specialty: specialtyName(s.specialty, "en"),
+      symptoms: symptoms.map((x) => tr(x, lang)).join("; "),
+      lang,
+      existingFields: templateFields.map((f) => tr(f.label, lang)).slice(0, 80),
+    };
+    const parts = ["history", "exam", "support"] as const;
+    update({
+      fields: templateFields,
+      suggestions: { followUpQuestions: [], possibleAssessments: [], nextSteps: [], redFlags: [] },
+      pending: parts.length,
+      runId,
+      translateFailed: false,
+    });
+    let errored = false;
+    for (const part of parts) {
+      generate({ data: { ...base, part } })
+        .then((res) => {
+          if (!res.ok) {
+            if (!errored) toast.error(t.errors[res.error] ?? t.errors['generic']);
+            errored = true;
+            return;
+          }
+          const { fields, ...sg } = res.result;
+          update((p) => {
+            if (p.runId !== runId) return {};
+            const known = new Set(p.fields.map((f) => tr(f.label, lang).toLowerCase()));
+            const fresh = fields.filter((f) => !known.has(f.label.toLowerCase()));
+            const cur = p.suggestions ?? { followUpQuestions: [], possibleAssessments: [], nextSteps: [], redFlags: [] };
+            return {
+              fields: [
+                ...p.fields,
+                ...fresh.map((f) => ({
+                  id: uid(),
+                  type: f.type,
+                  label: b(f.label),
+                  unit: f.unit ? b(f.unit) : null,
+                  section: f.section ? b(f.section) : null,
+                  options: f.options ? f.options.map(b) : null,
+                  source: "ai" as const,
+                })),
+              ],
+              suggestions: {
+                followUpQuestions: [...cur.followUpQuestions, ...sg.followUpQuestions.map(b)],
+                possibleAssessments: [...cur.possibleAssessments, ...sg.possibleAssessments.map(b)],
+                nextSteps: [...cur.nextSteps, ...sg.nextSteps.map(b)],
+                redFlags: [...cur.redFlags, ...sg.redFlags.map(b)],
+              },
+            };
+          });
+        })
+        .catch(() => {
+          if (!errored) toast.error(t.errors['generic']);
+          errored = true;
+        })
+        .finally(() => update((p) => (p.runId === runId ? { pending: Math.max(0, p.pending - 1) } : {})));
     }
+    setLoading(false);
+    navigate({ to: "/intake" });
   };
 
   return (
