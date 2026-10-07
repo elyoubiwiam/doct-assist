@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
 import { useSession, type Suggestions } from "@/lib/session";
-import { defaultTemplate, fromLang, isMissing, resetTemplate, saveTemplate, specialtyName, tr, uid, type Field, type FieldType } from "@/lib/specialties";
+import { defaultTemplate, fromLang, resetTemplate, saveTemplate, specialtyName, tr, uid, type Field, type FieldType } from "@/lib/specialties";
 
 export const Route = createFileRoute("/intake")({
   head: () => ({
