@@ -15,9 +15,9 @@ import { fromLang, specialtyName, tr, uid } from "@/lib/specialties";
 export const Route = createFileRoute("/symptoms")({
   head: () => ({
     meta: [
-      { title: "Enter symptoms | Doc Assist" },
+      { title: "Enter symptoms | DoctAssist" },
       { name: "description", content: "Enter presenting symptoms to generate a tailored intake form." },
-      { property: "og:title", content: "Enter symptoms | Doc Assist" },
+      { property: "og:title", content: "Enter symptoms | DoctAssist" },
       { property: "og:description", content: "Generate structured data-entry fields from presenting symptoms." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

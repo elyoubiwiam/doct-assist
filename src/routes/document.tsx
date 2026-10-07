@@ -11,9 +11,9 @@ import { specialtyName, tr, type Field } from "@/lib/specialties";
 export const Route = createFileRoute("/document")({
   head: () => ({
     meta: [
-      { title: "Patient document | Doc Assist" },
+      { title: "Patient document | DoctAssist" },
       { name: "description", content: "Review, download or print the clinical intake record as a PDF." },
-      { property: "og:title", content: "Patient document | Doc Assist" },
+      { property: "og:title", content: "Patient document | DoctAssist" },
       { property: "og:description", content: "A clean, printable clinical intake record." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

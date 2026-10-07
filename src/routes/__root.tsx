@@ -92,9 +92,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Doc Assist: structured clinical intake" },
+      { title: "DoctAssist: structured clinical intake" },
       { name: "description", content: "AI-assisted structured patient intake for clinicians." },
-      { property: "og:title", content: "Doc Assist: structured clinical intake" },
+      { property: "og:title", content: "DoctAssist: structured clinical intake" },
       { property: "og:description", content: "AI-assisted structured patient intake for clinicians." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
