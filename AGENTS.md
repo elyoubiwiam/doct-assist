@@ -15,3 +15,4 @@
 - AI intake generation runs only in the `generateIntake` server function; the browser never calls the AI gateway directly.
 - Intake generation uses the model's lowest supported reasoning effort and concise, coverage-led output without fixed item counts or post-generation truncation, so latency optimisation does not discard clinical content.
 - Intake generation is split into parallel parts (history, exam, support) that stream into the form, so the clinician starts filling in immediately; why: cuts waiting without dropping coverage.
+- Alias @vercel/oidc to src/lib/server/vercel-oidc-stub.ts in vite.config.ts; why: the real package uses createRequire(node:fs), which crashes the published Worker on every request.
