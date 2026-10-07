@@ -21,6 +21,9 @@ export type Session = {
   suggestions: Suggestions | null;
   included: Record<keyof Suggestions, boolean>;
   translateFailed: boolean;
+  /** number of AI generation parts still running (reset on reload) */
+  pending: number;
+  runId: string;
 };
 
 const empty = (): Session => ({
@@ -34,6 +37,8 @@ const empty = (): Session => ({
   suggestions: null,
   included: { followUpQuestions: true, possibleAssessments: true, nextSteps: true, redFlags: true },
   translateFailed: false,
+  pending: 0,
+  runId: "",
 });
 
 const KEY = "anamnesis.session.v2";
@@ -52,7 +57,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     try {
       sessionStorage.removeItem("anamnesis.session");
       const raw = sessionStorage.getItem(KEY);
-      if (raw) setS({ ...empty(), ...JSON.parse(raw) });
+      if (raw) setS({ ...empty(), ...JSON.parse(raw), pending: 0 });
     } catch {
       /* ignore */
     }
