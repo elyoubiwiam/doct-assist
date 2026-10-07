@@ -6,7 +6,18 @@ const inputSchema = z.object({
   symptoms: z.string().trim().min(2).max(2000),
   lang: z.enum(["en", "fr"]),
   existingFields: z.array(z.string().max(200)).max(80),
+  /** history: history/risk/negatives fields; exam: vitals/examination fields; support: decision support only */
+  part: z.enum(["history", "exam", "support"]).default("history"),
 });
+
+const PART_FOCUS = {
+  history:
+    "Only produce fields. Focus on history of the presenting complaint, relevant past history, medication, risk factors and pertinent negatives. Do not produce vital signs or examination fields. Return empty arrays for followUpQuestions, possibleAssessments, nextSteps and redFlags.",
+  exam:
+    "Only produce fields. Focus on vital signs, measurements, physical examination findings and bedside tests or scores. Do not produce history or risk factor fields. Return empty arrays for followUpQuestions, possibleAssessments, nextSteps and redFlags.",
+  support:
+    "Return an empty fields array. Only produce followUpQuestions, possibleAssessments, nextSteps and redFlags.",
+} as const;
 
 export type GeneratedField = {
   label: string;
@@ -64,7 +75,8 @@ Produce:
 - possibleAssessments: relevant differential considerations, phrased as possibilities to consider.
 - nextSteps: relevant investigations or management steps to consider.
 - redFlags: relevant warning signs that warrant urgent escalation.
-Prioritise coverage and clinical relevance, not a fixed item count. Do not omit necessary fields or suggestions to shorten the response. Keep labels, section names and suggestions concise, avoid repetition and explanatory prose, and output only the requested structured content.`;
+Prioritise coverage and clinical relevance, not a fixed item count. Do not omit necessary fields or suggestions to shorten the response. Keep labels, section names and suggestions concise, avoid repetition and explanatory prose, and output only the requested structured content.
+This request covers one part of the work, other parts run in parallel: ${PART_FOCUS[data.part]}`;
 
     const prompt = `Specialty: ${data.specialty}
 Presenting symptoms: ${data.symptoms}
