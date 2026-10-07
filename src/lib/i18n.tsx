@@ -34,6 +34,7 @@ const dict = {
     ],
     legalAccept: "I am a healthcare professional and I have read and accept these terms.",
     legalButton: "Accept and continue",
+    legalCredit: "Co-built with Dr Saad El Alj",
     // specialty
     specialtyTitle: "Select your specialty",
     specialtySub: "Each specialty loads a reusable intake template that you can edit.",
@@ -132,6 +133,7 @@ const dict = {
     ],
     legalAccept: "Je certifie être un professionnel de santé et avoir lu et accepté ces conditions.",
     legalButton: "Accepter et continuer",
+    legalCredit: "Co-développé avec le Dr Saad El Alj",
     specialtyTitle: "Sélectionnez votre spécialité",
     specialtySub: "Chaque spécialité charge un modèle de formulaire réutilisable et modifiable.",
     searchSpecialty: "Rechercher une spécialité",
