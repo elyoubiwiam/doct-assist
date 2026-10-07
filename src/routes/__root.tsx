@@ -42,6 +42,17 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
+    const msg = error instanceof Error ? error.message : String(error);
+    // A stale page chunk after a restart or new deploy: reload once to fetch the fresh one.
+    if (/dynamically imported module|Importing a module script failed/i.test(msg)) {
+      const key = "anamnesis.chunkReload";
+      const last = Number(sessionStorage.getItem(key) ?? 0);
+      if (Date.now() - last > 10000) {
+        sessionStorage.setItem(key, String(Date.now()));
+        window.location.reload();
+        return;
+      }
+    }
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
