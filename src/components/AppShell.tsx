@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,8 @@ import { Loader2 } from "lucide-react";
 export function AppShell({ step, children }: { step: number; children: ReactNode }) {
   const { t, lang, setLang } = useI18n();
   const { pending, failed, retry } = useAutoTranslate();
+  const initialLang = useRef(lang);
+  const userSwitched = lang !== initialLang.current;
   return (
     <div className="min-h-screen">
       <header className="no-print sticky top-0 z-20 border-b bg-card/90 backdrop-blur">
@@ -48,7 +50,7 @@ export function AppShell({ step, children }: { step: number; children: ReactNode
       </header>
       <main className="mx-auto max-w-5xl px-5 py-8">
         <p className="no-print mb-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">{t.stepOf(step, 5)}</p>
-        {(pending || failed) && (
+        {userSwitched && (pending || failed) && (
           <div className="no-print mb-4 flex items-center gap-3 rounded-md border bg-card px-4 py-2 text-sm text-muted-foreground">
             {pending ? (
               <><Loader2 className="h-4 w-4 animate-spin" />{t.translating}</>
