@@ -16,3 +16,4 @@
 - Intake generation uses the model's lowest supported reasoning effort and concise, coverage-led output without fixed item counts or post-generation truncation, so latency optimisation does not discard clinical content.
 - Intake generation is split into parallel parts (history, exam, support) that stream into the form, so the clinician starts filling in immediately; why: cuts waiting without dropping coverage.
 - Alias @vercel/oidc to src/lib/server/vercel-oidc-stub.ts in vite.config.ts; why: the real package uses createRequire(node:fs), which crashes the published Worker on every request.
+- The brand mark has one source: the Lucide stethoscope paths on a primary-blue rounded square, exported to public/favicon.svg, public/favicon.ico and public/apple-touch-icon.png; the navbar icon and the browser tab / search-result icon must stay identical, so regenerate those exports whenever the mark changes.
