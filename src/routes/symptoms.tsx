@@ -66,6 +66,7 @@ function SymptomsPage() {
       fields: templateFields,
       suggestions: { followUpQuestions: [], possibleAssessments: [], nextSteps: [], redFlags: [] },
       pending: parts.length,
+      excluded: {},
       runId,
       translateFailed: false,
     });

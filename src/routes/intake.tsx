@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
 import { useSession, type Suggestions } from "@/lib/session";
-import { defaultTemplate, fromLang, isMissing, resetTemplate, saveTemplate, specialtyName, tr, uid, type Field, type FieldType } from "@/lib/specialties";
+import { defaultTemplate, fromLang, resetTemplate, saveTemplate, specialtyName, tr, uid, type Field, type FieldType } from "@/lib/specialties";
 
 export const Route = createFileRoute("/intake")({
   head: () => ({
@@ -81,9 +81,6 @@ function FieldGroup({ title, fields, tag }: { title: string; fields: Field[]; ta
               <Label className="text-sm">
                 {tr(f.label, lang)}
                 {f.section && <span className="ml-2 text-xs font-normal text-muted-foreground">{tr(f.section, lang)}</span>}
-                {(isMissing(f.label) || (f.options ?? []).some(isMissing)) && (
-                  <span className="ml-2 rounded bg-warning px-1.5 py-0.5 text-[10px] font-normal text-warning-foreground">{t.notTranslated}</span>
-                )}
               </Label>
               <button
                 aria-label={t.remove}
@@ -152,17 +149,44 @@ function SuggestionBlock({ k, title, danger }: { k: keyof Suggestions; title: st
   const { s, update } = useSession();
   const items = s.suggestions?.[k] ?? [];
   if (!items.length) return null;
+  const key = (i: number) => `${k}:${i}`;
+  const allOn = items.every((_, i) => !s.excluded[key(i)]);
+  const setAll = (on: boolean) =>
+    update((p) => {
+      const ex = { ...p.excluded };
+      items.forEach((_, i) => (on ? delete ex[key(i)] : (ex[key(i)] = true)));
+      return { excluded: ex };
+    });
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className={`font-sans text-sm font-semibold ${danger ? "text-destructive" : ""}`}>{title}</h3>
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          {t.include}
-          <Switch checked={s.included[k]} onCheckedChange={(c) => update((p) => ({ included: { ...p.included, [k]: c } }))} />
+          <Checkbox checked={allOn} onCheckedChange={(c) => setAll(c === true)} />
+          {t.selectAll}
         </label>
       </div>
-      <ul className="list-disc space-y-1 pl-5 text-sm">
-        {items.map((x, i) => <li key={i}>{tr(x, lang)}</li>)}
+      <p className="mb-2 text-xs text-muted-foreground">{t.include}</p>
+      <ul className="space-y-1.5 text-sm">
+        {items.map((x, i) => (
+          <li key={i}>
+            <label className="flex items-start gap-2">
+              <Checkbox
+                className="mt-0.5"
+                checked={!s.excluded[key(i)]}
+                onCheckedChange={(c) =>
+                  update((p) => {
+                    const ex = { ...p.excluded };
+                    if (c === true) delete ex[key(i)];
+                    else ex[key(i)] = true;
+                    return { excluded: ex };
+                  })
+                }
+              />
+              <span>{tr(x, lang)}</span>
+            </label>
+          </li>
+        ))}
       </ul>
     </div>
   );

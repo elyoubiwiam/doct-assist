@@ -20,6 +20,8 @@ export type Session = {
   notes: string;
   suggestions: Suggestions | null;
   included: Record<keyof Suggestions, boolean>;
+  /** per-item exclusions from the document, keyed `${group}:${index}` */
+  excluded: Record<string, boolean>;
   translateFailed: boolean;
   /** number of AI generation parts still running (reset on reload) */
   pending: number;
@@ -36,6 +38,7 @@ const empty = (): Session => ({
   notes: "",
   suggestions: null,
   included: { followUpQuestions: true, possibleAssessments: true, nextSteps: true, redFlags: true },
+  excluded: {},
   translateFailed: false,
   pending: 0,
   runId: "",
