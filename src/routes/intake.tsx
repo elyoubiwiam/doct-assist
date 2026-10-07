@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { AlertTriangle, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Guard } from "@/components/Guard";
@@ -205,6 +205,12 @@ function IntakePage() {
             </section>
 
             <FieldGroup title={t.templateFields} fields={[...tpl, ...custom]} />
+            {s.pending > 0 && (
+              <div role="status" className="flex items-center gap-2 rounded-xl border border-primary/30 bg-accent p-4 text-sm text-accent-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t.stillGenerating}
+              </div>
+            )}
             <FieldGroup title={t.aiFields} fields={ai} tag={t.aiBadge} />
             <AddField />
             <div className="flex flex-wrap gap-2">
