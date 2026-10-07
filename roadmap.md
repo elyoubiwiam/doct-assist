@@ -1,0 +1,3 @@
+- [ ] Show the doctor's icon on the specialty search and symptoms pages.
+- [ ] Remove completeness-limiting generation caps and optimise the AI request.
+- [ ] Verify a real symptom-to-form flow and page presentation.

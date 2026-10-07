@@ -13,3 +13,4 @@
 - Patient data stays in browser sessionStorage (`src/lib/session.tsx`); never persist it server-side, because of medical data sensitivity.
 - All session and template text is stored bilingually ({ en, fr }); missing sides are filled by the `translateContent` server function via `useAutoTranslate`, so content follows the language toggle. Clinician-edited templates are saved per specialty in localStorage (`src/lib/specialties.ts`).
 - AI intake generation runs only in the `generateIntake` server function; the browser never calls the AI gateway directly.
+- Intake generation uses the model's lowest supported reasoning effort and concise, coverage-led output without fixed item counts or post-generation truncation, so latency optimisation does not discard clinical content.

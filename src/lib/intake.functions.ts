@@ -59,12 +59,12 @@ export const generateIntake = createServerFn({ method: "POST" })
 Write every string in ${language}. Never use em dashes or en dashes; use commas, colons or full stops instead.
 Be clinically accurate and conservative. Do not invent facts about the patient. Output is decision support for the clinician to review, never patient-facing advice.
 Produce:
-- fields: 6 to 10 concise data-entry fields that help document the presented symptoms (e.g. "Temperature" number with unit "°C", "Onset" select, "Associated cough" checkbox). Use "checkbox" for yes/no findings, "number" with a unit for measurements, "select" with 3 to 6 options for categorical answers, "text" for short answers, "textarea" for descriptions. Group them with a short "section" name (e.g. "Vital signs", "History of presenting complaint", "Examination"). Do not repeat any of the existing fields provided. Set unit and options to null when not applicable.
-- followUpQuestions: 4 to 6 questions the clinician may ask the patient.
-- possibleAssessments: 3 to 6 differential considerations, phrased as possibilities to consider.
-- nextSteps: 3 to 6 possible investigations or management steps to consider.
-- redFlags: 2 to 5 warning signs that would warrant urgent escalation.
-Keep each item under 160 characters.`;
+- fields: all clinically relevant additional data-entry fields for the full symptom list. Cover relevant history, vital signs, examination, risk factors and pertinent negatives. Existing fields remain on the form, so do not duplicate them. Use "checkbox" for yes/no findings, "number" with a unit for measurements, "select" with clinically appropriate options, "text" for short answers, "textarea" for descriptions. Group fields with short section names. Set unit and options to null when not applicable.
+- followUpQuestions: the clinically relevant questions needed to clarify the symptoms and risks.
+- possibleAssessments: relevant differential considerations, phrased as possibilities to consider.
+- nextSteps: relevant investigations or management steps to consider.
+- redFlags: relevant warning signs that warrant urgent escalation.
+Prioritise coverage and clinical relevance, not a fixed item count. Do not omit necessary fields or suggestions to shorten the response. Keep labels, section names and suggestions concise, avoid repetition and explanatory prose, and output only the requested structured content.`;
 
     const prompt = `Specialty: ${data.specialty}
 Presenting symptoms: ${data.symptoms}
@@ -80,7 +80,8 @@ Existing fields already on the form: ${data.existingFields.join("; ") || "none"}
           openai: {
             store: false,
             forceReasoning: true,
-            reasoningEffort: "minimal",
+            reasoningEffort: "low",
+            reasoningSummary: "auto",
             include: ["reasoning.encrypted_content"],
             strictJsonSchema: true,
           },
@@ -91,7 +92,7 @@ Existing fields already on the form: ${data.existingFields.join("; ") || "none"}
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error) && error.text) {
         try {
-          return { ok: true, result: clean(JSON.parse(error.text) as GeneratedIntake) };
+          return { ok: true, result: clean(schema.parse(JSON.parse(error.text))) };
         } catch {
           /* fall through */
         }
@@ -104,20 +105,21 @@ Existing fields already on the form: ${data.existingFields.join("; ") || "none"}
     }
   });
 
-const noDash = (s: string) => s.replace(/\s*[\u2014\u2013]\s*/g, ", ").slice(0, 600);
+const noDash = (s: string) => s.replace(/\s*[\u2014\u2013]\s*/g, ", ");
 
 function clean(o: GeneratedIntake): GeneratedIntake {
   return {
-    fields: (o.fields ?? []).slice(0, 20).map((f) => ({
+    fields: (o.fields ?? []).map((f) => ({
       ...f,
       label: noDash(f.label),
       section: noDash(f.section),
-      options: f.options ? f.options.slice(0, 8).map(noDash) : null,
+      unit: f.unit ? noDash(f.unit) : null,
+      options: f.options ? f.options.map(noDash) : null,
     })),
-    followUpQuestions: (o.followUpQuestions ?? []).slice(0, 10).map(noDash),
-    possibleAssessments: (o.possibleAssessments ?? []).slice(0, 8).map(noDash),
-    nextSteps: (o.nextSteps ?? []).slice(0, 8).map(noDash),
-    redFlags: (o.redFlags ?? []).slice(0, 6).map(noDash),
+    followUpQuestions: (o.followUpQuestions ?? []).map(noDash),
+    possibleAssessments: (o.possibleAssessments ?? []).map(noDash),
+    nextSteps: (o.nextSteps ?? []).map(noDash),
+    redFlags: (o.redFlags ?? []).map(noDash),
   };
 }
 
