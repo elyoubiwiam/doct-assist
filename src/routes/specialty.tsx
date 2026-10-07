@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Stethoscope } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Guard } from "@/components/Guard";
 import { Input } from "@/components/ui/input";
@@ -33,7 +34,10 @@ function SpecialtyPage() {
   return (
     <AppShell step={2}>
       <Guard when={s.accepted}>
-        <h1 className="text-3xl font-semibold">{t.specialtyTitle}</h1>
+        <div className="flex items-center gap-3">
+          <Stethoscope className="h-7 w-7 shrink-0 text-primary" aria-hidden="true" />
+          <h1 className="text-3xl font-semibold">{t.specialtyTitle}</h1>
+        </div>
         <p className="mt-1 text-muted-foreground">{t.specialtySub}</p>
         <Input className="mt-6 max-w-sm bg-card" placeholder={t.searchSpecialty} value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

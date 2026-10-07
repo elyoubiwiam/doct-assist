@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Loader2, X } from "lucide-react";
+import { Loader2, Stethoscope, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Guard } from "@/components/Guard";
@@ -41,6 +41,7 @@ function SymptomsPage() {
   };
 
   const run = async () => {
+    if (!s.specialty || loading) return;
     const symptoms = draft.trim() ? [...s.symptoms, fromLang(draft.trim().slice(0, 200), lang)] : s.symptoms;
     if (!symptoms.length) {
       toast.error(t.noSymptoms);
@@ -55,7 +56,7 @@ function SymptomsPage() {
       const templateFields = s.fields.filter((f) => f.source !== "ai");
       const res = await generate({
         data: {
-          specialty: specialtyName(s.specialty!, "en"),
+          specialty: specialtyName(s.specialty, "en"),
           symptoms: symptoms.map((x) => tr(x, lang)).join("; "),
           lang,
           existingFields: templateFields.map((f) => tr(f.label, lang)).slice(0, 80),
@@ -100,7 +101,10 @@ function SymptomsPage() {
     <AppShell step={3}>
       <Guard when={s.accepted && !!s.specialty}>
         <p className="text-sm font-medium text-primary">{s.specialty && specialtyName(s.specialty, lang)}</p>
-        <h1 className="text-3xl font-semibold">{t.symptomsTitle}</h1>
+        <div className="flex items-center gap-3">
+          <Stethoscope className="h-7 w-7 shrink-0 text-primary" aria-hidden="true" />
+          <h1 className="text-3xl font-semibold">{t.symptomsTitle}</h1>
+        </div>
         <p className="mt-1 text-muted-foreground">{t.symptomsSub}</p>
         <div className="mt-6 rounded-xl border bg-card p-6">
           <div className="flex gap-2">

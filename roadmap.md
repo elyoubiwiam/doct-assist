@@ -1,0 +1,3 @@
+- [x] Show the doctor's icon on the specialty search and symptoms pages.
+- [x] Remove completeness-limiting generation caps and optimise the AI request.
+- [x] Verify a real symptom-to-form flow and page presentation. Respiratory test retained 35 template fields and 42 suggested fields, with all four suggestion groups and document creation; generation took 64 seconds, so a speed improvement is not established.
