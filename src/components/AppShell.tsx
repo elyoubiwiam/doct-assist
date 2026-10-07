@@ -1,3 +1,4 @@
+import { Stethoscope } from "lucide-react";
 import { useRef, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
@@ -15,7 +16,7 @@ export function AppShell({ step, children }: { step: number; children: ReactNode
       <header className="no-print sticky top-0 z-20 border-b bg-card/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-primary font-serif text-lg font-semibold text-primary-foreground">A</span>
+            <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground"><Stethoscope className="h-5 w-5" /></span>
             <span className="leading-tight">
               <span className="block font-serif text-lg font-semibold">{t.brand}</span>
               <span className="block text-xs text-muted-foreground">{t.tagline}</span>

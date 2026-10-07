@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/specialty")({
   head: () => ({
     meta: [
-      { title: "Select a specialty | Anamnesis" },
+      { title: "Select a specialty | Doc Assist" },
       { name: "description", content: "Choose a specialty to load its reusable, editable intake template." },
-      { property: "og:title", content: "Select a specialty | Anamnesis" },
+      { property: "og:title", content: "Select a specialty | Doc Assist" },
       { property: "og:description", content: "Twenty outpatient specialty templates, editable by clinicians." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

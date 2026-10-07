@@ -37,27 +37,27 @@
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.975 0.006 95);
+  --background: oklch(0.975 0.015 235);
   --foreground: oklch(0.22 0.03 230);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.22 0.03 230);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.03 230);
-  --primary: oklch(0.42 0.08 200);
-  --primary-foreground: oklch(0.98 0.01 200);
-  --secondary: oklch(0.94 0.02 190);
-  --secondary-foreground: oklch(0.3 0.06 200);
-  --muted: oklch(0.95 0.008 95);
+  --primary: oklch(0.58 0.14 240);
+  --primary-foreground: oklch(0.99 0.01 240);
+  --secondary: oklch(0.94 0.03 235);
+  --secondary-foreground: oklch(0.32 0.09 245);
+  --muted: oklch(0.95 0.015 235);
   --muted-foreground: oklch(0.5 0.02 230);
-  --accent: oklch(0.93 0.03 190);
-  --accent-foreground: oklch(0.3 0.06 200);
+  --accent: oklch(0.92 0.045 235);
+  --accent-foreground: oklch(0.32 0.09 245);
   --destructive: oklch(0.55 0.2 27);
   --destructive-foreground: oklch(0.98 0 0);
   --warning: oklch(0.95 0.05 85);
   --warning-foreground: oklch(0.4 0.09 70);
-  --border: oklch(0.9 0.01 95);
-  --input: oklch(0.88 0.012 95);
-  --ring: oklch(0.42 0.08 200);
+  --border: oklch(0.9 0.025 235);
+  --input: oklch(0.87 0.03 235);
+  --ring: oklch(0.58 0.14 240);
 }
 
 @layer base {
