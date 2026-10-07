@@ -17,9 +17,9 @@ import { defaultTemplate, fromLang, isMissing, resetTemplate, saveTemplate, spec
 export const Route = createFileRoute("/intake")({
   head: () => ({
     meta: [
-      { title: "Intake form | Anamnesis" },
+      { title: "Intake form | Doc Assist" },
       { name: "description", content: "Complete the structured intake form and review decision support suggestions." },
-      { property: "og:title", content: "Intake form | Anamnesis" },
+      { property: "og:title", content: "Intake form | Doc Assist" },
       { property: "og:description", content: "Editable intake fields with clinician decision support." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

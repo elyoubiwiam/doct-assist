@@ -59,8 +59,8 @@ export const generateIntake = createServerFn({ method: "POST" })
 Write every string in ${language}. Never use em dashes or en dashes; use commas, colons or full stops instead.
 Be clinically accurate and conservative. Do not invent facts about the patient. Output is decision support for the clinician to review, never patient-facing advice.
 Produce:
-- fields: 6 to 14 concise data-entry fields that help document the presented symptoms (e.g. "Temperature" number with unit "°C", "Onset" select, "Associated cough" checkbox). Use "checkbox" for yes/no findings, "number" with a unit for measurements, "select" with 3 to 6 options for categorical answers, "text" for short answers, "textarea" for descriptions. Group them with a short "section" name (e.g. "Vital signs", "History of presenting complaint", "Examination"). Do not repeat any of the existing fields provided. Set unit and options to null when not applicable.
-- followUpQuestions: 4 to 8 questions the clinician may ask the patient.
+- fields: 6 to 10 concise data-entry fields that help document the presented symptoms (e.g. "Temperature" number with unit "°C", "Onset" select, "Associated cough" checkbox). Use "checkbox" for yes/no findings, "number" with a unit for measurements, "select" with 3 to 6 options for categorical answers, "text" for short answers, "textarea" for descriptions. Group them with a short "section" name (e.g. "Vital signs", "History of presenting complaint", "Examination"). Do not repeat any of the existing fields provided. Set unit and options to null when not applicable.
+- followUpQuestions: 4 to 6 questions the clinician may ask the patient.
 - possibleAssessments: 3 to 6 differential considerations, phrased as possibilities to consider.
 - nextSteps: 3 to 6 possible investigations or management steps to consider.
 - redFlags: 2 to 5 warning signs that would warrant urgent escalation.
@@ -80,7 +80,7 @@ Existing fields already on the form: ${data.existingFields.join("; ") || "none"}
           openai: {
             store: false,
             forceReasoning: true,
-            reasoningEffort: "low",
+            reasoningEffort: "minimal",
             include: ["reasoning.encrypted_content"],
             strictJsonSchema: true,
           },

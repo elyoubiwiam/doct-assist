@@ -5,7 +5,7 @@ const KEY = "anamnesis.lang";
 
 const dict = {
   en: {
-    brand: "Anamnesis",
+    brand: "Doc Assist",
     tagline: "Structured clinical intake",
     language: "Language",
     aiBadge: "AI",
@@ -102,7 +102,7 @@ const dict = {
     start: "Start",
   },
   fr: {
-    brand: "Anamnesis",
+    brand: "Doc Assist",
     tagline: "Recueil clinique structuré",
     language: "Langue",
     aiBadge: "IA",

@@ -1,3 +1,4 @@
+import { Stethoscope } from "lucide-react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -10,9 +11,9 @@ import { specialtyName, tr, type Field } from "@/lib/specialties";
 export const Route = createFileRoute("/document")({
   head: () => ({
     meta: [
-      { title: "Patient document | Anamnesis" },
+      { title: "Patient document | Doc Assist" },
       { name: "description", content: "Review, download or print the clinical intake record as a PDF." },
-      { property: "og:title", content: "Patient document | Anamnesis" },
+      { property: "og:title", content: "Patient document | Doc Assist" },
       { property: "og:description", content: "A clean, printable clinical intake record." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -79,7 +80,7 @@ function DocumentPage() {
         <article className="print-sheet mx-auto max-w-[210mm] rounded-xl border bg-card p-10 shadow-sm">
           <header className="flex items-start justify-between border-b-2 border-primary pb-4">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-md bg-primary font-serif text-xl font-semibold text-primary-foreground">A</span>
+              <span className="grid h-10 w-10 place-items-center rounded-md bg-primary text-primary-foreground"><Stethoscope className="h-6 w-6" /></span>
               <div>
                 <div className="font-serif text-xl font-semibold">{t.brand}</div>
                 <div className="text-xs text-muted-foreground">{t.tagline}</div>
