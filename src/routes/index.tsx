@@ -10,9 +10,9 @@ import { useSession } from "@/lib/session";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Doc Assist: data protection notice" },
+      { title: "DoctAssist: data protection notice" },
       { name: "description", content: "Read and accept the data protection notice before starting a structured clinical intake." },
-      { property: "og:title", content: "Doc Assist: structured clinical intake" },
+      { property: "og:title", content: "DoctAssist: structured clinical intake" },
       { property: "og:description", content: "AI-assisted structured patient intake for clinicians, in English and French." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
