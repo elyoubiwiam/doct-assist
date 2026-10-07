@@ -59,6 +59,9 @@ function LegalPage() {
             {t.legalButton}
           </Button>
         </div>
+        <p className="mt-8 border-t pt-4 text-center text-xs text-muted-foreground">
+          {t.legalCredit}
+        </p>
       </div>
     </AppShell>
   );
