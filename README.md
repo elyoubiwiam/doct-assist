@@ -47,4 +47,4 @@ Each step has its own page:
 
 ---
 
-Built by **Wiam El Youbi**, co-built with **Dr Saad El Alj**.
+Built by **Wiam El Youbi**, [wiam-elyoubi.com](https://wiam-elyoubi.com), co-built with **Dr Saad El Alj**.
