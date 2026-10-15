@@ -1,41 +1,50 @@
-# MediAssist AI
+# MediAssist AI (DoctAssist)
 
-I want to create a medical tool and agent. the purpose of it would be:
-a landing page, where doctors would type a or multiple symptoms of a patient, enter, and then the AI will generate boxes to check for the doctor or text entry areas (for example fever temperature), to organize, simplify and automate the process of patient data entry.
+**Structured clinical intake for doctors, with AI-assisted decision support, in English and French.**
 
-also, i'm open to suggestions, based on that, suggest to me additional functionalities. it will then create a patient document, that you can then download / print as pdf, with a clean branding.
+MediAssist turns a few typed symptoms into a structured, specialty-specific intake form. It then produces a clean patient document the doctor can download or print as a PDF.
 
-Include suggested follow-up questions and possible assessments or next steps, clearly labeled as decision support for the doctor to review rather than patient-facing advice.
+**Live app:** https://doct-assist.lovable.app
 
-Specialty templates — prioritize reusable specialty-specific intake forms, with clinician-editable fields and questions.
+> **For qualified healthcare professionals only.** AI suggestions are decision support for the clinician to review. They are not a diagnosis and are not intended for patients.
 
-Use a practical starter set of specialties for general outpatient care, and make the templates reusable with clinician-editable fields and follow-up questions.
+---
 
-Can you confirm that each step will be on it's own page? Also, first landing page step is select your specialty (give a wide range of choice) then what we previously discussed.
-Also the app need to be available in french and english. it should be a toggle on top of screen, and the tool will memorize the last language used.
+## How it works
 
-Be very strict in the languages you used, the words, no mistakes or hallucinations, should be uk english, and no em dashes in your text.
-Add legal clause at the start about data protection and sensitivity of the data because it's medical related.
+Each step has its own page:
 
-This project was built with [Lovable](https://lovable.dev).
+1. **Accept the data protection terms.** The clinician confirms they are a healthcare professional and accepts the confidentiality terms.
+2. **Select a specialty.** Choose from 20 outpatient specialties, including General Practice, Internal Medicine, Paediatrics, Cardiology, Respiratory, Gastroenterology, Neurology, Dermatology, ENT, Ophthalmology, OB/GYN, Urology, Endocrinology, Rheumatology, Orthopaedics, Psychiatry, Infectious Disease, Geriatrics, Emergency and Sports Medicine. Each specialty loads a reusable intake template.
+3. **Enter symptoms.** Type one or more symptoms, for example *"fever for three days, productive cough, breathlessness on exertion"*.
+4. **Fill in the generated form.** AI adds suggested fields for those symptoms (checkboxes, measurements such as temperature, and text fields) on top of the specialty template.
+5. **Create the patient document.** A branded clinical intake record, ready to download or print as a PDF.
 
-**Live app**: https://doct-assist.lovable.app
+## Key features
 
-## Build with Lovable
+- **Specialty templates that clinicians can edit:** save new fields to your own template, or restore the default at any time.
+- **AI-suggested fields** tailored to the symptoms entered. Suggestions keep loading while you start filling in the form.
+- **Decision support, clearly labelled:**
+  - Suggested follow-up questions
+  - Possible assessments to consider
+  - A checkbox for each item, plus *Select all*, so the clinician chooses what goes into the document
+- **Bilingual:** an English and French toggle at the top of the screen, and the app remembers the last language used.
+- **Printable patient document** with the AI-generated sections marked as decision support.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/5c6cdb4e-f2de-409c-a51d-f92dbed8bebe).
+## Data protection
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- Intended for qualified healthcare professionals only.
+- Users are asked to enter only the minimum data needed and to avoid direct identifiers such as full names, addresses or NHS numbers.
+- Symptom descriptions are sent to an AI service to generate suggestions, so no identifying details should be entered in the symptom field.
+- Downloaded documents are marked confidential.
 
-## Development
+## Tech stack
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- React, TypeScript, TanStack Start and Router, Vite
+- Tailwind CSS with shadcn/ui components
+- AI form generation through server functions
+- Built and hosted with [Lovable](https://lovable.dev)
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+---
+
+Built by **Wiam El Youbi**, co-built with **Dr Saad El Alj**.
